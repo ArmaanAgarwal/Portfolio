@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hackathons — Armaan Agarwal</title>
+<meta name="description" content="AntidoteML, a poisoning defense for federated learning built at the TLN Cybersecurity Challenge 2026, plus the earlier weekend builds that won — 1st at a UN Hackathon, 2nd at WilHacks 2.0.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div class="cursor-ring" aria-hidden="true"></div>
+<div class="cursor-dot" aria-hidden="true"></div>
+<div class="progress" aria-hidden="true"></div>
+
+<nav class="scrolled">
+  <a class="nav-logo" href="index.html" data-hover><b>AA</b> // armaan.agarwal</a>
+  <div class="nav-links">
+    <a href="index.html" data-hover>Home</a>
+    <a href="llm-engine.html" class="core" data-hover>LLM Engine</a>
+    <a href="hoopiq.html" class="core" data-hover>HoopIQ</a>
+    <a href="research.html" class="core" data-hover>Research</a>
+    <a href="hackathons.html" class="active" data-hover>Hackathons</a>
+    <a href="index.html#connect" class="nav-cta core" data-hover>Connect →</a>
+  </div>
+</nav>
+
+<header class="page-hero">
+  <div class="wrap">
+    <span class="crumb reveal in"><a href="index.html">← Back to home</a></span>
+    <div class="sec-label reveal in">Building under pressure · 2021 — 2026</div>
+    <h1 class="page-title reveal in">AntidoteML, and the ideas <span class="hl">that won.</span></h1>
+    <p class="lede reveal in">Hackathons taught me what a classroom can't: spotting a real problem, scoping it to a weekend, and shipping something that <strong>works in front of judges</strong> before the clock hits zero. The most recent one, <strong>AntidoteML</strong>, is the most serious: a 4-person team, a real adversarial-ML problem, and a working defense by the deadline. Below it are the earlier weekend builds where the pattern was the same — a genuine problem, a simple ML or automation core, and a demo that just works. <strong>Click any card to flip it.</strong></p>
+    <div class="win-badges reveal in">
+      <span class="wbadge"><span class="w-place">99.6→1.2%</span> AntidoteML · backdoor success</span>
+      <span class="wbadge"><span class="w-place">1st</span> UN Hackathon 2022 · 40+ teams</span>
+      <span class="wbadge"><span class="w-place">2nd</span> WilHacks 2.0</span>
+      <span class="wbadge"><span class="w-place">Winner</span> FillerBuster · Devpost</span>
+    </div>
+  </div>
+</header>
+
+<section style="padding-top:20px">
+  <div class="wrap">
+    <div class="antidote reveal">
+      <div class="an-head">
+        <div>
+          <div class="t-kicker" style="color:var(--amber)">TLN Cybersecurity Challenge 2026 · Sept 2026 · team lead</div>
+          <h2 style="margin-bottom:10px">AntidoteML — a poisoning defense for distributed ML</h2>
+          <p class="lede" style="margin-bottom:0">In federated learning, many clients train one shared model and send back weight updates. A single malicious client can plant a <strong>backdoor</strong> — a trigger pattern that makes the model misclassify on command while clean accuracy looks perfectly normal. AntidoteML catches the attacker from the updates alone.</p>
+        </div>
+      </div>
+      <div class="stat-grid" style="margin-top:28px">
+        <div class="stat-box"><div class="num">99.6<span class="u">%</span> → 1.2<span class="u">%</span></div><div class="lbl">BACKDOOR ATTACK SUCCESS</div></div>
+        <div class="stat-box"><div class="num">94.7<span class="u">%</span></div><div class="lbl">CLEAN ACCURACY ON GTSRB · 118 TESTS</div></div>
+        <div class="stat-box"><div class="num">629K</div><div class="lbl">PARAMETER CNN, SEEDED TRAINING</div></div>
+        <div class="stat-box"><div class="num">2</div><div class="lbl">ROUNDS TO EJECT THE ATTACKER</div></div>
+      </div>
+      <div class="an-grid">
+        <div class="research-card" style="margin:0">
+          <h3>What I built</h3>
+          <p><strong>The ML core.</strong> A 629K-parameter CNN on GTSRB (German traffic signs) in PyTorch with fully seeded training, so every run is reproducible, and paired metrics — clean accuracy and attack success rate — reported together so a "defense" can't hide a drop in one behind the other. 94.7% clean accuracy across 118 tests.</p>
+          <p><strong>The detector.</strong> Scores every client's weight update against the round's median using median/MAD z-scores, a robust statistic that a single outlier can't drag. Poisoned updates stand out; the server drops them and ejects the client. Backdoor success fell from 99.6% to 1.2% with no drop in clean accuracy, and the attacker was ejected two rounds after its first poison.</p>
+          <p><strong>The team.</strong> I led the 4-person team: split the system into four owned modules behind a fixed interface contract on day one, and owned every merge to main so the demo never broke.</p>
+          <div class="chips" style="margin-top:22px"><span class="chip">PyTorch</span><span class="chip">Federated Learning</span><span class="chip">Adversarial ML</span><span class="chip">Robust Statistics</span><span class="chip">GTSRB</span></div>
+        </div>
+        <div class="plain-card" style="margin:0">
+          <div class="pc-label">Why it matters</div>
+          <p>Backdoor attacks are the realistic threat to any model trained on data you don't fully control — federated phones, crowdsourced labels, open fine-tuning. The hard part isn't detecting a loud attacker; it's detecting one whose updates look almost normal <strong style="color:var(--text)">without throwing away honest clients whose data just happens to be unusual</strong>. Robust statistics are the right tool for exactly that line, and the paired-metric reporting is what makes the claim checkable.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-label reveal" style="margin-top:70px">Earlier builds · 2021 — 2024</div>
+    <div class="hack-grid">
+
+      <div class="flip reveal" tabindex="0" role="button" aria-label="RealMeals — click to flip for details" data-hover>
+        <div class="flip-inner">
+          <div class="flip-face flip-front">
+            <div class="f-place">1st</div>
+            <h3>RealMeals</h3>
+            <div class="f-event">UN Hackathon 2022 · won among 40+ teams</div>
+            <p class="f-tag">Point your camera at a meal; a machine-learning model tells you which food groups it's missing.</p>
+            <div class="f-hint">CLICK TO FLIP →</div>
+          </div>
+          <div class="flip-face flip-back">
+            <p>Built a <strong>Python/TensorFlow image-classification model</strong> that analyzes photos of meals and flags missing nutrients across the five food groups — a practical tool aimed at fighting diet-driven obesity. As a 4-person team, we trained the model, wrapped it in a usable app, and <strong>pitched it live to United Nations judges</strong>, taking 1st place out of more than 40 teams. My first proof that an ML model and a clear story beat a complicated demo.</p>
+            <div class="chips"><span class="chip">Python</span><span class="chip">TensorFlow</span><span class="chip">Computer Vision</span></div>
+            <a class="devpost-link" href="https://devpost.com/software/realmeals" target="_blank" rel="noopener" data-hover>View on Devpost ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip reveal" tabindex="0" role="button" aria-label="BoostMe — click to flip for details" data-hover>
+        <div class="flip-inner">
+          <div class="flip-face flip-front">
+            <div class="f-place">2nd</div>
+            <h3>BoostMe — COVID Vaccine Notifier</h3>
+            <div class="f-event">WilHacks 2.0 · winner badge</div>
+            <p class="f-tag">Texts you the moment a vaccine appointment opens in your zip code — built when appointments were nearly impossible to find.</p>
+            <div class="f-hint">CLICK TO FLIP →</div>
+          </div>
+          <div class="flip-face flip-back">
+            <p>During the height of the vaccine shortage, appointments vanished within minutes of appearing. BoostMe is a <strong>Python/Twilio service that continuously monitored appointment availability by zip code and sent instant SMS alerts</strong> when a slot opened. Simple architecture, real stakes: automation applied to a problem people were refreshing browser tabs over. Took 2nd place at WilHacks 2.0.</p>
+            <div class="chips"><span class="chip">Python</span><span class="chip">Twilio API</span><span class="chip">Automation</span></div>
+            <a class="devpost-link" href="https://devpost.com/software/boostme-covid-personal-notifier" target="_blank" rel="noopener" data-hover>View on Devpost ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip reveal" tabindex="0" role="button" aria-label="FillerBuster — click to flip for details" data-hover>
+        <div class="flip-inner">
+          <div class="flip-face flip-front">
+            <div class="f-place">★</div>
+            <h3>FillerBuster</h3>
+            <div class="f-event">Winner badge · Devpost</div>
+            <p class="f-tag">A public-speaking coach that catches your "um"s and "like"s — built to make high schoolers more confident presenters.</p>
+            <div class="f-hint">CLICK TO FLIP →</div>
+          </div>
+          <div class="flip-face flip-back">
+            <p>A speech-analysis tool that <strong>listens to you practice and flags filler words</strong> — the "um"s, "uh"s, and "like"s that undermine a presentation — so speakers can see their habits and train them away. Aimed at students who dread presenting. It earned a winner badge, and it's the project that taught me a tool people <em>actually want to use</em> starts from a problem you've personally felt.</p>
+            <div class="chips"><span class="chip">Python</span><span class="chip">Speech Analysis</span><span class="chip">EdTech</span></div>
+            <a class="devpost-link" href="https://devpost.com/software/fillerbuster" target="_blank" rel="noopener" data-hover>View on Devpost ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip reveal" tabindex="0" role="button" aria-label="Envision — click to flip for details" data-hover>
+        <div class="flip-inner">
+          <div class="flip-face flip-front">
+            <div class="f-place blue">◐</div>
+            <h3>Envision</h3>
+            <div class="f-event">Code for Good · "See beyond limitations"</div>
+            <p class="f-tag">An assistive-vision app that describes the world out loud for visually impaired users, in real time.</p>
+            <div class="f-hint">CLICK TO FLIP →</div>
+          </div>
+          <div class="flip-face flip-back">
+            <p>An accessibility app that <strong>pairs OpenCV with TensorFlow to caption a live camera feed</strong> — describing surroundings aloud so visually impaired users can navigate more independently. Real-time image captioning on a hackathon deadline forced hard trade-offs between model size, latency, and accuracy: my first genuine lesson in deploying ML under constraints, not just training it.</p>
+            <div class="chips"><span class="chip">OpenCV</span><span class="chip">TensorFlow</span><span class="chip">Real-time CV</span><span class="chip">Accessibility</span></div>
+            <a class="devpost-link" href="https://devpost.com/software/envision-uo3t28" target="_blank" rel="noopener" data-hover>View on Devpost ↗</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="text-align:center;margin-top:44px" class="reveal">
+      <a class="btn" href="https://devpost.com/agarwal-armaan27" target="_blank" rel="noopener" data-hover>See all projects on Devpost ↗</a>
+    </div>
+
+    <div class="sub-connect reveal">
+      <div>
+        <h3>Running a hackathon, or hiring people who ship fast?</h3>
+        <p>Weekend builds are where I learned to move quickly without cutting the corners that matter. If that's the kind of energy your team runs on, let's talk.</p>
+      </div>
+      <div class="sc-btns">
+        <a class="btn solid" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=armaanagarwa@umass.edu&amp;su=Let%27s%20talk" target="_blank" rel="noopener" data-hover>Email me</a>
+        <a class="btn" href="https://www.linkedin.com/in/armaan-agarwal-781419245/" target="_blank" rel="noopener" data-hover>Connect on LinkedIn</a>
+      </div>
+    </div>
+
+    <div class="next-page reveal">
+      <a href="research.html" data-hover>← Research</a>
+      <a href="index.html#connect" data-hover>Next: connect with me →</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-links">
+    <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=armaanagarwa@umass.edu" target="_blank" rel="noopener" data-hover>email</a>
+    <a href="https://www.linkedin.com/in/armaan-agarwal-781419245/" target="_blank" rel="noopener" data-hover>linkedin</a>
+    <a href="https://github.com/ArmaanAgarwal" target="_blank" rel="noopener" data-hover>github</a>
+    <a href="https://devpost.com/agarwal-armaan27" target="_blank" rel="noopener" data-hover>devpost</a>
+  </div>
+  <div class="foot-fine">© 2026 Armaan Agarwal · designed &amp; built by hand</div>
+</footer>
+
+<script src="assets/app.js"></script>
+</body>
+</html>

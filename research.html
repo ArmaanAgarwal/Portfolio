@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Research — Armaan Agarwal</title>
+<meta name="description" content="Undergraduate research at UMass Amherst's DREAM Lab: package query evaluation, LP vs. ILP trade-offs, and adversarial analysis of published algorithms.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div class="cursor-ring" aria-hidden="true"></div>
+<div class="cursor-dot" aria-hidden="true"></div>
+<div class="progress" aria-hidden="true"></div>
+
+<nav class="scrolled">
+  <a class="nav-logo" href="index.html" data-hover><b>AA</b> // armaan.agarwal</a>
+  <div class="nav-links">
+    <a href="index.html" data-hover>Home</a>
+    <a href="llm-engine.html" class="core" data-hover>LLM Engine</a>
+    <a href="hoopiq.html" class="core" data-hover>HoopIQ</a>
+    <a href="research.html" class="core active" data-hover>Research</a>
+    <a href="hackathons.html" data-hover>Hackathons</a>
+    <a href="index.html#connect" class="nav-cta core" data-hover>Connect →</a>
+  </div>
+</nav>
+
+<header class="page-hero">
+  <div class="wrap">
+    <span class="crumb reveal in"><a href="index.html">← Back to home</a></span>
+    <div class="sec-label reveal in">Undergraduate research · DREAM Lab, UMass Amherst</div>
+    <h1 class="page-title reveal in">When can a fast answer<br>be <span class="hl">trusted?</span></h1>
+    <p class="lede reveal in">I work with <strong>Prof. Neha Makhija</strong> at the DREAM Lab on package queries — a class of database problems where getting the exact answer means solving a hard optimization problem. My job is to find out, with experiments, exactly when the cheap shortcut gives the right answer and when it quietly fails.</p>
+    <div class="stat-grid reveal in" style="grid-template-columns:repeat(3,1fr)">
+      <div class="stat-box"><div class="num">82<span class="u">%</span></div><div class="lbl">OVERALL LP/ILP MATCH RATE</div></div>
+      <div class="stat-box"><div class="num">100<span class="u">%</span></div><div class="lbl">ON COUNT-ONLY CONSTRAINTS</div></div>
+      <div class="stat-box"><div class="num">~72<span class="u">%</span></div><div class="lbl">ONCE SUM CONSTRAINTS ENTER</div></div>
+    </div>
+  </div>
+</header>
+
+<section style="padding-top:40px">
+  <div class="wrap">
+    <div class="plain-card reveal">
+      <div class="pc-label">In plain terms</div>
+      <p>A normal database query asks for rows one at a time: "show me every stock under $50." A <strong style="color:var(--text)">package query</strong> asks for a <strong style="color:var(--text)">set</strong> of rows that work together: "build me a portfolio under a $10,000 budget that maximizes expected return." That's no longer a lookup — it's a combinatorial optimization problem, and the number of possible sets explodes exponentially. Solving it exactly means integer linear programming (ILP), which can be brutally slow. Relaxing it to a plain linear program (LP) is fast — but sometimes wrong. My research measures the size and shape of that "sometimes."</p>
+    </div>
+
+    <div class="research-card reveal">
+      <h3>What I've actually done</h3>
+      <div class="sub">Dec 2025 — Present · advised by Prof. Neha Makhija · Gurobi · TPC-H · PaQL · PostgreSQL · Python</div>
+      <p><strong>Showed when the fast LP relaxation can be trusted.</strong> I ran 120 controlled experiments across 5 query templates (Gurobi as the solver, the TPC-H dataset, PaQL query syntax) measuring how often the LP relaxation lands on the same answer as the exact ILP. The result: <strong>82% agreement overall — 100% on queries with only COUNT constraints, dropping to roughly 72% once SUM constraints enter.</strong> That gap is the finding: it identifies precisely which constraint structures make cheap approximation unsafe, which tells a database engine when it must pay for the exact solve.</p>
+      <p><strong>Made the whole sweep reproducible from one command.</strong> I built the Python/Gurobi benchmarking harness the group now uses: it runs every template, logs objectives, optimality gaps, and solve times to CSV, and lets anyone in the lab regenerate the full 120-run result set without touching my notebook.</p>
+      <p><strong>Found concrete worst cases for Progressive Shading (VLDB '24)</strong> — the lab's state-of-the-art package-query algorithm. By constructing low-constraint adversarial inputs at its partition boundaries, I produced instances that each force more partitioning steps than the paper's analysis predicts. Finding where a published algorithm breaks is the fastest way to understand why it works — and it's the same skeptical instinct behind the negative results in my <a href="llm-engine.html" style="color:var(--ice)">inference engine</a>.</p>
+      <p><strong>Presented the LP-vs-ILP results and the adversarial analysis to the lab</strong>, backed by a seven-chart analysis workbook, which set the direction for the group's next round of experiments.</p>
+      <div class="chips" style="margin-top:26px">
+        <span class="chip" data-hover>Integer Linear Programming</span>
+        <span class="chip" data-hover>LP Relaxation</span>
+        <span class="chip" data-hover>Gurobi</span>
+        <span class="chip" data-hover>TPC-H</span>
+        <span class="chip" data-hover>PaQL</span>
+        <span class="chip" data-hover>PostgreSQL</span>
+        <span class="chip" data-hover>Adversarial Analysis</span>
+      </div>
+    </div>
+
+    <div class="plain-card reveal" style="border-color:rgba(232,163,61,.3)">
+      <div class="pc-label">Why this matters beyond databases</div>
+      <p>"When is the fast approximation good enough?" is one of the central questions of applied quantitative work — it shows up in portfolio construction, resource allocation, scheduling, and model selection. This research is where I learned to answer it the only trustworthy way: <strong style="color:var(--text)">define the benchmark, run the experiment, and report where the method fails, not just where it shines.</strong> It's also the long-term engine behind HoopIQ's roster-optimization endgame — picking a team under a salary cap <em>is</em> a package query.</p>
+    </div>
+
+    <div class="sub-connect reveal">
+      <div>
+        <h3>Work in optimization, databases, or quant research?</h3>
+        <p>I'd love to compare notes — on this work, on where the field is going, or on what a strong researcher-in-training should be doing next. Advice welcome, always.</p>
+      </div>
+      <div class="sc-btns">
+        <a class="btn solid" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=armaanagarwa@umass.edu&amp;su=About%20your%20package%20query%20research" target="_blank" rel="noopener" data-hover>Email me about it</a>
+        <a class="btn" href="https://www.linkedin.com/in/armaan-agarwal-781419245/" target="_blank" rel="noopener" data-hover>Connect on LinkedIn</a>
+      </div>
+    </div>
+
+    <div class="next-page reveal">
+      <a href="hoopiq.html" data-hover>← HoopIQ</a>
+      <a href="hackathons.html" data-hover>Next: hackathons →</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-links">
+    <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=armaanagarwa@umass.edu" target="_blank" rel="noopener" data-hover>email</a>
+    <a href="https://www.linkedin.com/in/armaan-agarwal-781419245/" target="_blank" rel="noopener" data-hover>linkedin</a>
+    <a href="https://github.com/ArmaanAgarwal" target="_blank" rel="noopener" data-hover>github</a>
+    <a href="https://devpost.com/agarwal-armaan27" target="_blank" rel="noopener" data-hover>devpost</a>
+  </div>
+  <div class="foot-fine">© 2026 Armaan Agarwal · designed &amp; built by hand</div>
+</footer>
+
+<script src="assets/app.js"></script>
+</body>
+</html>

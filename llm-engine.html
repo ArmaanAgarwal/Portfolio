@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LLM Inference Engine — Armaan Agarwal</title>
+<meta name="description" content="A from-scratch LLM inference engine in PyTorch and CUDA: KV cache, batching, CUDA-graph decode, INT8 quantization, and a fused RMSNorm kernel. 1,929 tok/s on a T4, 2.1× Hugging Face, every optimization measured.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div class="cursor-ring" aria-hidden="true"></div>
+<div class="cursor-dot" aria-hidden="true"></div>
+<div class="progress" aria-hidden="true"></div>
+
+<nav class="scrolled">
+  <a class="nav-logo" href="index.html" data-hover><b>AA</b> // armaan.agarwal</a>
+  <div class="nav-links">
+    <a href="index.html" data-hover>Home</a>
+    <a href="llm-engine.html" class="core active" data-hover>LLM Engine</a>
+    <a href="hoopiq.html" class="core" data-hover>HoopIQ</a>
+    <a href="research.html" class="core" data-hover>Research</a>
+    <a href="hackathons.html" data-hover>Hackathons</a>
+    <a href="index.html#connect" class="nav-cta core" data-hover>Connect →</a>
+  </div>
+</nav>
+
+<header class="page-hero">
+  <div class="wrap">
+    <span class="crumb reveal in"><a href="index.html">← Back to home</a></span>
+    <div class="sec-label reveal in">Flagship project · Oct 2026 · PyTorch · CUDA · C++</div>
+    <h1 class="page-title reveal in">An LLM inference engine,<br>built <span class="hl">from scratch.</span></h1>
+    <p class="lede reveal in">Every layer of <strong>Qwen2.5-0.5B</strong> written by hand in PyTorch, then made fast: a KV cache, batched decoding, CUDA-graph replay, INT8 quantization, and a fused CUDA kernel. Each optimization was benchmarked on its own on a T4, <strong>including the two that didn't help</strong>. The result matches Hugging Face token-for-token and runs 2.1× faster at batch 32, 4.2× faster at batch 1.</p>
+    <div class="hero-cta reveal in" style="margin-bottom:8px">
+      <a class="btn solid" href="https://github.com/ArmaanAgarwal/llm-engine" target="_blank" rel="noopener" data-hover data-magnet>Read the code on GitHub ↗</a>
+      <a class="btn" href="#results" data-hover data-magnet>Jump to the numbers</a>
+    </div>
+    <div class="stat-grid reveal in">
+      <div class="stat-box"><div class="num">1,929<span class="u"> tok/s</span></div><div class="lbl">DECODE THROUGHPUT · BATCH 32 · T4</div></div>
+      <div class="stat-box"><div class="num">4.2<span class="u">×</span></div><div class="lbl">FASTER THAN HUGGING FACE AT BATCH 1</div></div>
+      <div class="stat-box"><div class="num">5.8<span class="u">×</span></div><div class="lbl">FUSED RMSNORM KERNEL VS PYTORCH</div></div>
+      <div class="stat-box"><div class="num">7.5e-5</div><div class="lbl">MAX LOGIT ERROR VS HUGGING FACE</div></div>
+    </div>
+  </div>
+</header>
+
+<section style="padding-top:40px">
+  <div class="wrap">
+
+    <div class="plain-card reveal">
+      <div class="pc-label">In plain terms</div>
+      <p>When a language model writes a reply, it produces one token at a time, and for <strong style="color:var(--text)">every single token it has to read the entire model out of GPU memory</strong> — about 1 GB for this one. On a T4 that read alone takes ~3 ms; the actual math takes ~15 µs. The GPU spends over 95% of its time waiting on memory, not computing. So making inference fast isn't about doing math faster. It's about <strong style="color:var(--text)">reading fewer bytes per token, or getting more tokens out of every read</strong>. This project is me building that from nothing and measuring what each trick is actually worth.</p>
+    </div>
+
+    <!-- ===== THE BOTTLENECK ===== -->
+    <div class="sec-label reveal" style="margin-top:70px">01 — The bottleneck</div>
+    <h2 class="reveal">Decode is <span class="hl">memory-bound.</span></h2>
+    <div class="bw-grid reveal">
+      <div class="bw-card">
+        <div class="bw-k">Weights read per token</div>
+        <div class="bw-v">~1 GB</div>
+        <div class="bw-n">494M params × 2 bytes (fp16)</div>
+      </div>
+      <div class="bw-op">÷</div>
+      <div class="bw-card">
+        <div class="bw-k">T4 memory bandwidth</div>
+        <div class="bw-v">320 GB/s</div>
+        <div class="bw-n">HBM2, the physical ceiling</div>
+      </div>
+      <div class="bw-op">=</div>
+      <div class="bw-card amber">
+        <div class="bw-k">Time moving bytes</div>
+        <div class="bw-v">~3 ms</div>
+        <div class="bw-n">per token, at batch 1</div>
+      </div>
+      <div class="bw-op">vs</div>
+      <div class="bw-card ice">
+        <div class="bw-k">Time doing math</div>
+        <div class="bw-v">~15 µs</div>
+        <div class="bw-n">~1 GFLOP at 65 TFLOPS</div>
+      </div>
+    </div>
+    <p class="lede reveal" style="margin-top:30px;max-width:900px">That 200× ratio sets the ceiling: <strong>~300 tokens/sec at batch 1, from bandwidth alone.</strong> Every optimization below either reads fewer bytes (INT8, fused kernels) or serves more tokens per read (KV cache, batching). And one more cost shows up only when you measure: a 24-layer decode step is ~300 tiny kernel launches, and at small batch the GPU finishes each one faster than Python can issue the next. That's what CUDA graphs fix.</p>
+
+    <!-- ===== CHART ===== -->
+    <div class="sec-label reveal" style="margin-top:80px" id="results">02 — What each optimization is worth</div>
+    <h2 class="reveal">Decode throughput, <span class="hl">configuration by configuration.</span></h2>
+    <p class="lede reveal">Tokens per second, aggregate across the batch, 128 generated tokens, median of 3 runs on a Google Colab T4. Log scale — hover a bar for the exact value.</p>
+    <div class="chart-card reveal">
+      <div class="chart-legend" id="chartLegend"></div>
+      <div class="chart-wrap"><svg id="tpChart" role="img" aria-label="Decode throughput by configuration and batch size"></svg></div>
+      <div class="chart-foot">vLLM, the production reference, reaches <b>3,449 tok/s</b> at batch 32 — 1.8× our best. Before CUDA graphs that gap was 3.3×.</div>
+    </div>
+
+    <div class="table-scroll reveal" style="margin-top:28px">
+      <table class="mtable">
+        <thead><tr><th>Configuration</th><th>Batch 1</th><th>Batch 8</th><th>Batch 32</th><th>What changed</th></tr></thead>
+        <tbody>
+          <tr><td>Hugging Face <code>generate</code>, fp16</td><td>28.6</td><td>240</td><td>919</td><td>The baseline everyone starts from</td></tr>
+          <tr><td>Ours, no cache, fp32</td><td>34.2</td><td>114</td><td>131</td><td>Recomputes every token each step — quadratic</td></tr>
+          <tr><td>Ours + KV cache, fp16</td><td>36.0</td><td>282</td><td>1,076</td><td>Linear. The single biggest win</td></tr>
+          <tr><td><span style="color:var(--amber)">Ours + CUDA-graph decode</span></td><td><b>120</b></td><td><b>806</b></td><td><b>1,929</b></td><td>Whole decode step replayed as one launch</td></tr>
+          <tr><td>Ours + INT8 weight-only</td><td>29.5</td><td>228</td><td>879</td><td>Smaller weights, but slower — see below</td></tr>
+          <tr><td>Ours + fused RMSNorm</td><td>31.2</td><td>265</td><td>990</td><td>5.8× faster kernel, invisible end-to-end</td></tr>
+          <tr><td>vLLM, fp16</td><td>—</td><td>—</td><td>3,449</td><td>Paged KV, fused attention, continuous batching</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ===== ANALYSIS ===== -->
+    <div class="sec-label reveal" style="margin-top:80px">03 — What the numbers say</div>
+    <h2 class="reveal">Three wins, two honest <span class="hl">negatives.</span></h2>
+    <div class="finding-grid">
+      <div class="finding reveal win">
+        <div class="f-tag">WIN · 8.2× at batch 32</div>
+        <h3>The KV cache is the whole game</h3>
+        <p>Without it, every new token recomputes attention over the full sequence, so cost grows quadratically — 131 tok/s at batch 32 and falling. Caching each layer's keys and values in preallocated buffers turns it linear: 1,076. This is the optimization every real engine has, and the one everything else stacks on.</p>
+      </div>
+      <div class="finding reveal win">
+        <div class="f-tag">WIN · 3.3× at batch 1</div>
+        <h3>CUDA graphs beat the launch overhead</h3>
+        <p>Eager batch-1 decode was 36 tok/s against a ~300 tok/s bandwidth ceiling, so memory wasn't the bottleneck there — Python was. Capturing one decode step with <code>torch.cuda.graph</code> and replaying it as a single launch gives 3.3× at batch 1, 2.9× at batch 8, 1.8× at batch 32. The gain shrinks as batch grows because the weight read starts to dominate. Making it work meant removing every Python-side integer from the step: a fixed mask over the whole cache, <code>index_copy_</code> at a device-side position, positions derived on-device.</p>
+      </div>
+      <div class="finding reveal win">
+        <div class="f-tag">WIN · 16× from batch 1 → 32</div>
+        <h3>Batching is the bandwidth argument made visible</h3>
+        <p>Each decode step reads the ~1 GB of weights once. At batch 32 that one read serves 32 sequences, so throughput goes 120 → 1,929 for nearly the same memory traffic. This is why serving systems care so much about keeping batches full.</p>
+      </div>
+      <div class="finding reveal loss">
+        <div class="f-tag">NEGATIVE · 18% slower</div>
+        <h3>INT8 shrank the weights and made it slower</h3>
+        <p>Per-row INT8 cut weights from 988 MB to 631 MB with no perplexity loss on WikiText-2 (18.07 → 17.99, inside noise). But throughput dropped from 1,076 to 879. Dequantizing <code>int8 → fp16</code> on the fly in PyTorch writes a temporary fp16 copy of every weight matrix and then reads it back for the GEMM — an extra full pass that costs more bandwidth than the int8 read saves. The win only materializes with a fused dequant-GEMM kernel that reads int8 and multiplies in one pass, which is what TensorRT-LLM does. <strong>INT8 is a kernel problem, not a storage problem.</strong></p>
+      </div>
+      <div class="finding reveal loss">
+        <div class="f-tag">NEGATIVE · inside noise</div>
+        <h3>The fused kernel is 5.8× faster and invisible</h3>
+        <p>My CUDA RMSNorm replaces PyTorch's three ops (square-mean, rsqrt, multiply) — three launches and three memory round-trips — with one read and one write, reaching 128 GB/s on a prefill-sized block. In isolation it's 5.8× faster. End-to-end, nothing moves: RMSNorm is under 2% of a decode step for an 896-wide model, and 5.8× on 2% is Amdahl's law. <strong>Profile before you optimize.</strong> The kernel worth writing next is attention or the dequant-GEMM.</p>
+      </div>
+      <div class="finding reveal next">
+        <div class="f-tag">GAP · 1.8× to vLLM</div>
+        <h3>What's left, and I know exactly what it is</h3>
+        <p>vLLM's remaining lead comes from three things this engine doesn't have: paged KV memory (no padding waste across different-length sequences), fused attention kernels (QKᵀ, softmax, and ×V in one pass), and continuous batching (admit new requests as old ones finish). Each is a known next step, not a mystery.</p>
+      </div>
+    </div>
+
+    <!-- ===== KERNEL ===== -->
+    <div class="sec-label reveal" style="margin-top:80px">04 — The CUDA kernel</div>
+    <h2 class="reveal">One block per row, one warp-shuffle <span class="hl">reduction.</span></h2>
+    <div class="reveal" style="max-width:900px;margin-bottom:28px">
+        <p style="color:var(--muted);margin-bottom:14px">RMSNorm is <code class="ic">y = x / sqrt(mean(x²) + ε) · w</code>. PyTorch runs it as three kernels: square-and-mean, rsqrt, multiply — each reading and writing the full activation tensor. My kernel does it in one pass: <strong>256 threads per block, one block per row</strong>; each thread sums the squares of its slice, a <code class="ic">__shfl_down_sync</code> reduction collapses each warp, shared memory collapses the warps, and every thread writes its normalized outputs. One HBM read, one write. Compiled as a PyTorch C++ extension with <code class="ic">torch.utils.cpp_extension.load</code>, templated over float, half, and bfloat16, and verified against PyTorch to 7e-4 in fp16.</p>
+        <p style="color:var(--muted)">The microbenchmark reports achieved bandwidth so the number means something: 128 GB/s is 40% of the T4's peak, respectable for a reduction with scalar loads. Vectorized <code class="ic">half2</code> loads would push it higher. At decode shapes the kernel is launch-bound, which is exactly why it doesn't move the end-to-end number.</p>
+    </div>
+      <div class="table-scroll reveal">
+        <table class="mtable">
+          <thead><tr><th>Shape</th><th>PyTorch</th><th>Fused</th><th>Speedup</th><th>Bandwidth</th></tr></thead>
+          <tbody>
+            <tr><td>decode b=1 · 1×1×896</td><td>111 µs</td><td>19 µs</td><td>5.8×</td><td>launch-bound</td></tr>
+            <tr><td>decode b=32 · 32×1×896</td><td>125 µs</td><td>19 µs</td><td>6.6×</td><td>6 GB/s</td></tr>
+            <tr><td>prefill · 32×128×896</td><td>643 µs</td><td>115 µs</td><td>5.6×</td><td>128 GB/s · 40% of peak</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    <!-- ===== COMPONENTS ===== -->
+    <div class="sec-label reveal" style="margin-top:80px">05 — What's in the engine</div>
+    <h2 class="reveal">Every piece, <span class="hl">written by hand.</span></h2>
+    <p class="lede reveal">Hugging Face is used for exactly three things: downloading the weights, running the tokenizer, and being the reference I test against. Everything else is in the repo. Click a row.</p>
+
+    <div class="stage-phase p-done reveal">The model</div>
+    <div class="stage reveal">
+      <button class="stage-btn" data-hover><span class="stage-num">01</span><span class="stage-name">Forward pass — Qwen2.5-0.5B, layer by layer</span><span class="stage-status done">matches HF</span><span class="stage-arrow">▼</span></button>
+      <div class="stage-body"><div class="stage-body-in">
+        <p>Embedding → 24 × (RMSNorm → grouped-query attention with RoPE → residual → RMSNorm → SwiGLU MLP → residual) → final norm → tied unembedding. Hidden size 896, MLP 4,864, 14 query heads sharing 2 key/value heads, head dim 64, vocab 151,936.</p>
+        <p>The details that had to be exactly right to match Hugging Face to <strong>7.5e-5</strong>: RoPE uses the "halves" layout (rotating pairs <code>i, i+32</code>, not adjacent pairs); q/k/v projections carry a bias but o_proj doesn't; RMSNorm accumulates in fp32 even when the model runs in fp16; the output head shares the embedding matrix. <code>engine/model.py</code></p>
+      </div></div>
+    </div>
+    <div class="stage reveal">
+      <button class="stage-btn" data-hover><span class="stage-num">02</span><span class="stage-name">KV cache — prefill once, decode forever</span><span class="stage-status done">8.2× at b=32</span><span class="stage-arrow">▼</span></button>
+      <div class="stage-body"><div class="stage-body-in">
+        <p>Preallocated <code>[layers, batch, kv_heads, max_len, head_dim]</code> buffers. <code>prefill()</code> runs the whole prompt once and fills them; <code>decode()</code> runs one new token and appends its key and value in place. Grouped-query attention makes the cache 7× smaller than full multi-head would be. <code>engine/model.py → KVCache</code></p>
+      </div></div>
+    </div>
+    <div class="stage reveal">
+      <button class="stage-btn" data-hover><span class="stage-num">03</span><span class="stage-name">Batching — left-padded, bit-identical to single-prompt</span><span class="stage-status done">16× b=1→32</span><span class="stage-arrow">▼</span></button>
+      <div class="stage-body"><div class="stage-body-in">
+        <p>Prompts of different lengths are left-padded into one tensor. A boolean attention mask keeps pad tokens from ever being attended to, and per-row RoPE positions make each sequence count from its own first real token. The test asserts that batched output equals running each prompt alone — it caught a real bug on the first run. <code>engine/model.py → prefill / decode</code></p>
+      </div></div>
+    </div>
+
+    <div class="stage-phase p-now reveal">The optimizations</div>
+    <div class="stage reveal">
+      <button class="stage-btn" data-hover><span class="stage-num">04</span><span class="stage-name">CUDA-graph decode — the whole step as one launch</span><span class="stage-status now">3.3× at b=1</span><span class="stage-arrow">▼</span></button>
+      <div class="stage-body"><div class="stage-body-in">
+        <p>A CUDA graph records every kernel launch in a decode step once, then replays the sequence as a single launch with no CPU in the loop. The catch: every tensor must keep a fixed address and shape. So the decoder owns static token, position, and mask buffers; writes the cache with <code>index_copy_</code> at a device-side position tensor; and attends over the full cache with a float <code>-inf</code> mask that hides the unfilled slots. Between replays it updates those buffers in place. Verified token-for-token against eager decode. <code>engine/graph.py → GraphDecoder</code></p>
+        <p>The bug worth mentioning: the first benchmark run crashed because <code>prefill</code> didn't reset the cache position between runs, so the second prefill wrote at slot 8 instead of 0. One line to fix, found only because the benchmark reuses the decoder.</p>
+      </div></div>
+    </div>
+    <div class="stage reveal">
+      <button class="stage-btn" data-hover><span class="stage-num">05</span><span class="stage-name">INT8 weight-only quantization</span><span class="stage-status vision">net loss</span><span class="stage-arrow">▼</span></button>
+      <div class="stage-body"><div class="stage-body-in">
+        <p>Each of the 168 linear layers stores int8 weights plus one fp16 scale per output row, dequantized on the fly in <code>forward</code>. Embedding and output head stay fp16, which is why 988 MB became 631 MB rather than exactly half. Perplexity on WikiText-2 (40 windows of 512 tokens) was unchanged. Throughput dropped 18% for the reason explained above. <code>engine/quant.py → QuantLinear</code></p>
+      </div></div>
+    </div>
+    <div class="stage reveal">
+      <button class="stage-btn" data-hover><span class="stage-num">06</span><span class="stage-name">Fused RMSNorm CUDA kernel</span><span class="stage-status now">5.8× in isolation</span><span class="stage-arrow">▼</span></button>
+      <div class="stage-body"><div class="stage-body-in">
+        <p>Described in full above. The engine's <code>RMSNorm</code> module routes to the kernel when a flag is on and the tensor is on CUDA, so the same code runs on CPU for tests. <code>csrc/rmsnorm.cu</code>, <code>engine/kernels.py</code></p>
+      </div></div>
+    </div>
+
+    <div class="stage-phase p-next reveal">The proof</div>
+    <div class="stage reveal">
+      <button class="stage-btn" data-hover><span class="stage-num">07</span><span class="stage-name">Tests — six checks, all token-exact</span><span class="stage-status done">PASS on T4</span><span class="stage-arrow">▼</span></button>
+      <div class="stage-body"><div class="stage-body-in">
+        <p>Logits vs Hugging Face across four prompts (7.5e-5 max error). Cached greedy == uncached greedy == Hugging Face greedy, token for token. Batched left-padded output == each prompt alone. CUDA-graph decode == eager decode. INT8 keeps 100% of greedy tokens on the test prompt. Fused kernel vs PyTorch RMSNorm to 7e-4. Plus a <code>--tiny</code> mode that builds a random 2-layer Qwen so the whole suite runs on a laptop CPU in seconds. <code>tests/test_engine.py</code></p>
+        <p>The mismatch that wasn't a bug: Hugging Face's greedy output differed from mine even with logits matching to 1e-4. Qwen's <code>generation_config.json</code> silently sets <code>repetition_penalty=1.1</code> even for greedy decoding. Disable it and the outputs are identical.</p>
+      </div></div>
+    </div>
+    <div class="stage reveal">
+      <button class="stage-btn" data-hover><span class="stage-num">08</span><span class="stage-name">Benchmarks — throughput, kernel, perplexity, vLLM</span><span class="stage-status done">reproducible</span><span class="stage-arrow">▼</span></button>
+      <div class="stage-body"><div class="stage-body-in">
+        <p>Every configuration × batch {1, 8, 32}, 128 new tokens, same prompts, median of 3 after a warm-up, written to CSV. A kernel microbenchmark that reports µs, speedup, and achieved GB/s against the T4's peak. Perplexity on WikiText-2 for fp16 vs INT8 on identical windows. The same model through vLLM for an honest reference. One Colab notebook runs all of it top to bottom. <code>bench/</code>, <code>run_all.ipynb</code></p>
+      </div></div>
+    </div>
+
+    <!-- ===== NEXT ===== -->
+    <div class="sec-label reveal" style="margin-top:80px">06 — What I'd do next</div>
+    <h2 class="reveal">In order of <span class="hl">expected payoff.</span></h2>
+    <div class="next-grid">
+      <div class="next-card reveal"><span class="n-num">1</span><div><h4>Fused INT8 dequant-GEMM kernel</h4><p>Turns the 18% INT8 loss into the ~35% bandwidth win the smaller weights promise. The single most valuable kernel for this model.</p></div></div>
+      <div class="next-card reveal"><span class="n-num">2</span><div><h4>Fused attention</h4><p>FlashAttention-style: QKᵀ, softmax, and ×V in one kernel without materializing the score matrix. The largest remaining piece of the vLLM gap.</p></div></div>
+      <div class="next-card reveal"><span class="n-num">3</span><div><h4>Paged KV cache + continuous batching</h4><p>Fixed-size cache blocks so different-length sequences don't waste padded slots, then admit new requests as old ones finish.</p></div></div>
+      <div class="next-card reveal"><span class="n-num">4</span><div><h4>Run it on an RTX 5070 Ti</h4><p>Blackwell has ~3× the T4's bandwidth. Batch-1 should scale almost linearly; batch-32 less, because launch overhead doesn't scale with bandwidth. A clean way to test the whole model of where time goes.</p></div></div>
+    </div>
+
+    <div class="sub-connect reveal">
+      <div>
+        <h3>Work on inference, GPU software, or ML systems?</h3>
+        <p>I'd like to hear what you'd have done differently — which kernel you'd write first, what I'm measuring wrong, what a strong systems engineer should build next. Blunt is better.</p>
+      </div>
+      <div class="sc-btns">
+        <a class="btn solid" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=armaanagarwa@umass.edu&amp;su=About%20your%20inference%20engine" target="_blank" rel="noopener" data-hover>Email me about it</a>
+        <a class="btn" href="https://github.com/ArmaanAgarwal/llm-engine" target="_blank" rel="noopener" data-hover>Read the repo ↗</a>
+      </div>
+    </div>
+
+    <div class="next-page reveal">
+      <a href="index.html" data-hover>← Home</a>
+      <a href="hoopiq.html" data-hover>Next: HoopIQ →</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-links">
+    <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=armaanagarwa@umass.edu" target="_blank" rel="noopener" data-hover>email</a>
+    <a href="https://www.linkedin.com/in/armaan-agarwal-781419245/" target="_blank" rel="noopener" data-hover>linkedin</a>
+    <a href="https://github.com/ArmaanAgarwal" target="_blank" rel="noopener" data-hover>github</a>
+    <a href="https://devpost.com/agarwal-armaan27" target="_blank" rel="noopener" data-hover>devpost</a>
+  </div>
+  <div class="foot-fine">© 2026 Armaan Agarwal · designed &amp; built by hand</div>
+</footer>
+
+<script src="assets/app.js"></script>
+</body>
+</html>

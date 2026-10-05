@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Armaan Agarwal — ML Systems · GPU Software · Machine Learning</title>
+<meta name="description" content="Armaan Agarwal — CS, Applied Math & Statistics @ UMass Amherst. Built an LLM inference engine from scratch in PyTorch and CUDA. Seeking ML systems, GPU software, and machine learning internships and co-ops for Summer 2027.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div class="cursor-ring" aria-hidden="true"></div>
+<div class="cursor-dot" aria-hidden="true"></div>
+<div class="progress" aria-hidden="true"></div>
+
+<nav>
+  <a class="nav-logo" href="index.html" data-hover><b>AA</b> // armaan.agarwal</a>
+  <div class="nav-links">
+    <a href="llm-engine.html" class="core" data-hover>LLM Engine</a>
+    <a href="hoopiq.html" class="core" data-hover>HoopIQ</a>
+    <a href="research.html" class="core" data-hover>Research</a>
+    <a href="hackathons.html" data-hover>Hackathons</a>
+    <a href="index.html#experience" data-hover>Experience</a>
+    <a href="index.html#connect" class="nav-cta core" data-hover>Connect →</a>
+  </div>
+</nav>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <canvas id="constellation" aria-hidden="true"></canvas>
+  <div class="hero-inner">
+    <div class="hero-eyebrow">ML Systems · GPU Software · Machine Learning</div>
+    <h1 class="hero-name" aria-label="Armaan Agarwal">
+      <span class="word" data-word="ARMAAN"></span>
+      <span class="word" data-word="AGARWAL"></span>
+    </h1>
+    <div class="hero-goal">
+      <div class="goal-line">
+        <span class="g-label">SEEKING</span>
+        <span class="g-roles"><b>Internships &amp; co-ops</b> — ML Systems · GPU / CUDA · Machine Learning · Data Science</span>
+        <span class="g-coop">Summer 2027 · either format, equally</span>
+      </div>
+    </div>
+    <p class="hero-role">
+      Sophomore at UMass Amherst, triple-majoring in CS, Applied Math, and Statistics &amp; Data Science.
+      Right now that means <span class="tick" id="roleTicker">an LLM inference engine I built from scratch — 1,929 tok/s on a T4</span> — and I'd like to hear what you think of the work.
+    </p>
+    <div class="hero-cta">
+      <a class="btn solid" href="llm-engine.html" data-hover data-magnet>See the LLM inference engine →</a>
+      <a class="btn" href="index.html#connect" data-hover data-magnet>Reach out / give advice</a>
+    </div>
+  </div>
+  <div class="scroll-cue">SCROLL</div>
+</header>
+
+<!-- ================= MARQUEE ================= -->
+<div class="marquee" aria-hidden="true"><div class="marquee-track" id="marqueeTrack"></div></div>
+
+<!-- ================= ABOUT ================= -->
+<section id="about">
+  <div class="wrap">
+    <div class="sec-label reveal">01 — Who I am</div>
+    <h2 class="reveal">Three majors, one focus: <span class="hl">making models run, and run fast.</span></h2>
+    <div class="about-grid">
+      <div class="reveal">
+        <p>I study <strong>Computer Science, Applied Mathematics, and Statistics &amp; Data Science</strong> at UMass Amherst (Class of 2028). The three degrees share one purpose: I want to be equally strong at writing the code, proving the math, and reading the data — because the roles I'm aiming for demand all three.</p>
+        <p>Right now, that plays out in three places. I built an <strong>LLM inference engine from scratch</strong> — every layer of a transformer in PyTorch, a KV cache, CUDA-graph decode, and a hand-written CUDA kernel — and benchmarked each optimization against Hugging Face and vLLM on a real GPU. I do <strong>undergraduate research in combinatorial optimization</strong> at the DREAM Lab, measuring when fast approximations of hard database problems can be trusted. And I built <strong>HoopIQ</strong>, an NBA prediction system that goes from 25 seasons of raw data to a validated model, and teach the databases course it runs on as a course assistant.</p>
+        <p>My goal is an <strong>ML systems, GPU software, machine learning, or data science role</strong> — internship or co-op, and I mean both equally. A co-op's longer runway is a feature to me, not a fallback: more time to own real work and ship something that matters. If you're a recruiter, engineer, or researcher, this site is built to show you exactly how I operate. And if you have advice, I'm listening — <a href="index.html#connect" style="color:var(--ice)">seriously</a>.</p>
+      </div>
+      <div class="fact-card reveal">
+        <div class="fact-row"><span class="k">based in</span><span class="v">Fremont, CA ⇄ Amherst, MA</span></div>
+        <div class="fact-row"><span class="k">degrees</span><span class="v">B.S. ×3 — CS · Applied Math · Stats &amp; DS</span></div>
+        <div class="fact-row"><span class="k">graduating</span><span class="v a">May 2028</span></div>
+        <div class="fact-row"><span class="k">seeking</span><span class="v a">internships &amp; co-ops — equally</span></div>
+        <div class="fact-row"><span class="k">roles</span><span class="v">ML Systems · GPU · ML · DS</span></div>
+        <div class="fact-row"><span class="k">research</span><span class="v">DREAM Lab, UMass Amherst</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= WORK TEASERS ================= -->
+<section id="work">
+  <div class="wrap">
+    <div class="sec-label reveal">02 — The work</div>
+    <h2 class="reveal">Four things worth <span class="hl">clicking into.</span></h2>
+    <p class="lede reveal">Each card below is a short preview. The full pages go much deeper — the reasoning, the numbers, and what's honestly still unfinished.</p>
+    <div class="teasers four">
+
+      <a class="teaser featured reveal" href="llm-engine.html" data-hover>
+        <div class="t-kicker">Flagship project · Oct 2026</div>
+        <h3>LLM Inference Engine — from scratch in PyTorch &amp; CUDA</h3>
+        <p>Every layer of Qwen2.5-0.5B written by hand, then made fast: KV cache, batched decoding, CUDA-graph replay, INT8 quantization, and a fused RMSNorm kernel. Each step benchmarked on a T4 against Hugging Face and vLLM — including the two that didn't help, and why.</p>
+        <div class="t-stats">
+          <span><b>1,929</b> tok/s</span>
+          <span><b>4.2×</b> HF at batch 1</span>
+          <span><b>5.8×</b> CUDA kernel</span>
+        </div>
+        <span class="t-link">Read the full breakdown <span class="arr">→</span></span>
+      </a>
+
+      <a class="teaser reveal" href="hoopiq.html" data-hover>
+        <div class="t-kicker">ML project · 16-stage build</div>
+        <h3>HoopIQ — an NBA prediction platform</h3>
+        <p>A machine-learning system built in sixteen validated stages: 25 seasons and 16.2M play-by-play rows, a leakage-proof pipeline, per-player RAPM from ridge regression, and a 0.70-AUC XGBoost model against a 55.9% home-team baseline. Includes a Monte Carlo season simulator you can run in your browser.</p>
+        <div class="t-stats">
+          <span><b>0.70</b> AUC</span>
+          <span><b>16.2M</b> play-by-play rows</span>
+          <span><b>16</b> stage roadmap</span>
+        </div>
+        <span class="t-link">Read the full build story <span class="arr">→</span></span>
+      </a>
+
+      <a class="teaser reveal" href="research.html" data-hover>
+        <div class="t-kicker">Undergraduate research · DREAM Lab</div>
+        <h3>When can you trust a fast approximation?</h3>
+        <p>I study "package queries" — database questions whose exact answers require solving hard integer programs. 120 controlled experiments across 5 query templates measure exactly when a fast LP relaxation gives the right answer (82% overall, 100% on count-only queries) and when it quietly fails.</p>
+        <div class="t-stats">
+          <span><b>82%</b> LP/ILP match rate</span>
+          <span><b>120</b> experiments</span>
+          <span><b>VLDB '24</b> algorithm broken</span>
+        </div>
+        <span class="t-link">See the research <span class="arr">→</span></span>
+      </a>
+
+      <a class="teaser reveal" href="hackathons.html" data-hover>
+        <div class="t-kicker">Building under pressure</div>
+        <h3>AntidoteML, and the ideas that won.</h3>
+        <p>Led a 4-person team at the TLN Cybersecurity Challenge 2026 to a working poisoning defense for federated learning: a 629K-parameter CNN at 94.7% on GTSRB, and a detector that cut backdoor success from 99.6% to 1.2%. Plus the earlier weekend builds that took 1st at a UN Hackathon and 2nd at WilHacks.</p>
+        <div class="t-stats">
+          <span><b>99.6→1.2%</b> attack success</span>
+          <span><b>1st</b> UN Hackathon</span>
+          <span><b>2nd</b> WilHacks 2.0</span>
+        </div>
+        <span class="t-link">Flip through the projects <span class="arr">→</span></span>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================= EXPERIENCE ================= -->
+<section id="experience">
+  <div class="wrap">
+    <div class="sec-label reveal">03 — Experience</div>
+    <h2 class="reveal">Where I've put it <span class="hl">to work.</span></h2>
+
+    <div class="xp-group now-group reveal">Current</div>
+    <div class="xp">
+      <div class="xp-item now reveal">
+        <div class="when">DEC 2025 — PRESENT</div>
+        <h3>Undergraduate Researcher, DREAM Lab</h3>
+        <div class="org">University of Massachusetts Amherst · Data Systems Research · advised by Prof. Neha Makhija</div>
+        <p>Research on package-query evaluation and combinatorial optimization. I showed when the lab's fast LP relaxation matches exact ILP on package queries — 82% of cases overall, 100% on count-only queries — by running 120 controlled experiments across 5 query templates, built the Python/Gurobi harness that makes the whole sweep reproducible from one command, and constructed adversarial inputs that force the lab's Progressive Shading algorithm through more partitioning steps than its paper predicts. <a class="in-link" href="research.html">Full detail on the research page →</a></p>
+      </div>
+      <div class="xp-item now reveal">
+        <div class="when">SEP 2026 — PRESENT</div>
+        <h3>Undergraduate Course Assistant — CS 345, Data Management</h3>
+        <div class="org">University of Massachusetts Amherst</div>
+        <p>I teach SQL, functional dependencies, BCNF, and transactions by running weekly PostgreSQL labs, debugging live schemas in front of the room, and grading lab submissions each week. The same foundations my research and HoopIQ's data pipeline run on — and if I can explain it clearly to a room of students, I actually understand it.</p>
+      </div>
+    </div>
+
+    <div class="xp-group reveal">Education</div>
+    <div class="xp">
+      <div class="xp-item reveal">
+        <div class="when">AUG 2025 — MAY 2028</div>
+        <h3>B.S. Computer Science · B.S. Applied Mathematics · B.S. Statistics &amp; Data Science</h3>
+        <div class="org">University of Massachusetts Amherst · GPA 3.67 · Dean's List · Study abroad: ISEP Paris, Fall 2025</div>
+        <p>Coursework: Data Structures, Algorithms, Data Management, Computer Systems, Machine Learning, Artificial Intelligence, Linear Algebra, Multivariable Calculus, Probability and Statistical Inference.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SKILLS ================= -->
+<section id="skills">
+  <div class="wrap">
+    <div class="sec-label reveal">04 — Toolkit</div>
+    <h2 class="reveal">What I <span class="hl">build with.</span></h2>
+    <div class="skill-groups reveal">
+      <div>
+        <h3>Languages</h3>
+        <div class="chips">
+          <span class="chip" data-hover>Python</span><span class="chip" data-hover>C++</span>
+          <span class="chip" data-hover>CUDA C++</span><span class="chip" data-hover>SQL (PostgreSQL)</span>
+          <span class="chip" data-hover>Java</span><span class="chip" data-hover>R</span>
+        </div>
+      </div>
+      <div>
+        <h3>ML &amp; GPU Systems</h3>
+        <div class="chips">
+          <span class="chip" data-hover>PyTorch</span><span class="chip" data-hover>CUDA kernels</span>
+          <span class="chip" data-hover>CUDA Graphs</span><span class="chip" data-hover>Nsight Systems</span>
+          <span class="chip" data-hover>PyTorch C++ extensions</span><span class="chip" data-hover>Quantization</span>
+          <span class="chip" data-hover>vLLM</span><span class="chip" data-hover>Hugging Face</span>
+          <span class="chip" data-hover>XGBoost</span><span class="chip" data-hover>scikit-learn</span>
+          <span class="chip" data-hover>pandas</span><span class="chip" data-hover>NumPy</span>
+        </div>
+      </div>
+      <div>
+        <h3>Tools &amp; Optimization</h3>
+        <div class="chips">
+          <span class="chip" data-hover>Git</span><span class="chip" data-hover>Docker</span>
+          <span class="chip" data-hover>Linux</span><span class="chip" data-hover>Gurobi</span>
+          <span class="chip" data-hover>Integer Programming</span><span class="chip" data-hover>FastAPI</span>
+          <span class="chip" data-hover>Jupyter / Colab</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONNECT ================= -->
+<section id="connect">
+  <div class="wrap">
+    <div class="sec-label reveal">05 — The real reason this site exists</div>
+    <h2 class="reveal">I'm asking for <span class="hl">your take.</span></h2>
+    <p class="lede reveal">Most portfolios end with "feel free to reach out." I mean it more literally than that. I'm early in my career, and honest input from people ahead of me is worth more than anything I can Google. Whichever of these fits you, the door is open:</p>
+
+    <div class="connect-cards">
+      <div class="ccard reveal">
+        <div class="c-ico">🎯</div>
+        <h3>Tell me what's missing</h3>
+        <p>You've seen hundreds of applications — I've written one. What would make mine more competitive for ML systems, GPU software, or machine learning roles? What should I build, learn, or fix next? Blunt is better.</p>
+        <a class="btn ice" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=armaanagarwa@umass.edu&amp;su=Some%20advice%20on%20your%20application" target="_blank" rel="noopener" data-hover>Send advice</a>
+      </div>
+      <div class="ccard reveal">
+        <div class="c-ico">💼</div>
+        <h3>Share an opportunity</h3>
+        <p>Internship, co-op, research role, or something adjacent — even if it doesn't look like an obvious fit, I'd rather hear about it and talk it through. There's no downside to a conversation.</p>
+        <a class="btn ice" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=armaanagarwa@umass.edu&amp;su=An%20opportunity%20you%20might%20want%20to%20hear%20about" target="_blank" rel="noopener" data-hover>Share it</a>
+      </div>
+      <div class="ccard reveal">
+        <div class="c-ico">🤝</div>
+        <h3>Just connect</h3>
+        <p>Questions about anything on this site, thoughts on the inference engine or HoopIQ's roadmap, or a quick chat about your own path — I'll take a 15-minute conversation with anyone doing interesting work.</p>
+        <a class="btn ice" href="https://www.linkedin.com/in/armaan-agarwal-781419245/" target="_blank" rel="noopener" data-hover>Connect on LinkedIn</a>
+      </div>
+    </div>
+
+    <div class="contact-big reveal">
+      Or just email me —<br>
+      <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=armaanagarwa@umass.edu" target="_blank" rel="noopener" data-hover>I answer everything.</a>
+    </div>
+    <div class="reveal" style="text-align:center;margin-top:34px">
+      <button class="copy-strip" data-copy="armaanagarwa@umass.edu" data-hover>
+        <span class="addr">armaanagarwa@umass.edu</span>
+        <span class="copy-tag">COPY</span>
+      </button>
+      <div style="font-family:var(--font-m);font-size:12px;color:var(--faint);margin-top:12px">the buttons open Gmail — or copy the address for your own email app</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-links">
+    <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=armaanagarwa@umass.edu" target="_blank" rel="noopener" data-hover>email</a>
+    <a href="https://www.linkedin.com/in/armaan-agarwal-781419245/" target="_blank" rel="noopener" data-hover>linkedin</a>
+    <a href="https://github.com/ArmaanAgarwal" target="_blank" rel="noopener" data-hover>github</a>
+    <a href="https://devpost.com/agarwal-armaan27" target="_blank" rel="noopener" data-hover>devpost</a>
+  </div>
+  <div class="foot-fine">© 2026 Armaan Agarwal · designed &amp; built by hand · Fremont, CA ⇄ Amherst, MA</div>
+</footer>
+
+<script src="assets/app.js"></script>
+</body>
+</html>

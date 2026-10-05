@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HoopIQ — Armaan Agarwal</title>
+<meta name="description" content="HoopIQ: an NBA prediction platform built in sixteen validated stages — from 25 seasons of raw data to a live in-game engine and a Monte Carlo season simulator.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<div class="cursor-ring" aria-hidden="true"></div>
+<div class="cursor-dot" aria-hidden="true"></div>
+<div class="progress" aria-hidden="true"></div>
+
+<nav class="scrolled">
+  <a class="nav-logo" href="index.html" data-hover><b>AA</b> // armaan.agarwal</a>
+  <div class="nav-links">
+    <a href="index.html" data-hover>Home</a>
+    <a href="llm-engine.html" class="core" data-hover>LLM Engine</a>
+    <a href="hoopiq.html" class="core active" data-hover>HoopIQ</a>
+    <a href="research.html" class="core" data-hover>Research</a>
+    <a href="hackathons.html" data-hover>Hackathons</a>
+    <a href="index.html#connect" class="nav-cta core" data-hover>Connect →</a>
+  </div>
+</nav>
+
+<!-- ================= PAGE HERO ================= -->
+<header class="page-hero">
+  <div class="wrap">
+    <span class="crumb reveal in"><a href="index.html">← Back to home</a></span>
+    <div class="sec-label reveal in">Flagship project</div>
+    <h1 class="page-title reveal in">HoopIQ<span class="hl">.</span></h1>
+    <p class="lede reveal in">Before every NBA game, HoopIQ answers one question: <strong>given everything known right now — how both teams have been playing, who's healthy, where the game is, how rested everyone is — what is the probability each team wins, and why?</strong> It starts as a rigorous machine-learning engine and grows, stage by stage, into a live platform: automated data feeds, in-game win probability that updates as the game unfolds, and — as the final capstone — a Monte Carlo simulator that plays out entire seasons thousands of times.</p>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center" class="reveal in">
+      <span class="pill">ACTIVELY BUILDING · DAILY COMMITS</span>
+      <a class="btn" href="https://github.com/ArmaanAgarwal" target="_blank" rel="noopener" data-hover>View on GitHub ↗</a>
+    </div>
+    <div class="stat-grid reveal in">
+      <div class="stat-box"><div class="num">25</div><div class="lbl">NBA SEASONS (2000-01 → 2024-25)</div></div>
+      <div class="stat-box"><div class="num">~68<span class="u">K</span></div><div class="lbl">TEAM-GAME ROWS · ~34K GAMES</div></div>
+      <div class="stat-box"><div class="num">63.9<span class="u">%</span></div><div class="lbl">BASELINE ACCURACY, VALIDATED</div></div>
+      <div class="stat-box"><div class="num">+8.1<span class="u">pts</span></div><div class="lbl">OVER THE NAIVE HOME-TEAM PICK</div></div>
+    </div>
+    <div class="build-meter reveal in">
+      <div class="bm-top">
+        <span><b>5 of 16</b> stages shipped — early innings, and that's the point</span>
+        <span>updated July 2026</span>
+      </div>
+      <div class="bm-bar"><div class="bm-fill" data-width="31%"></div></div>
+      <div class="bm-note">This is a multi-year build, documented honestly. The shipped stages are a validated foundation — everything after them is planned, sequenced, and public before it's written.</div>
+    </div>
+  </div>
+</header>
+
+<!-- ================= WHAT IT IS ================= -->
+<section style="padding-top:40px">
+  <div class="wrap">
+    <div class="plain-card reveal">
+      <div class="pc-label">In plain terms</div>
+      <p>HoopIQ is a prediction system that refuses to cheat. The model only ever sees information that existed before tip-off. Its accuracy claims are verified with sanity checks, not just reported. Each new layer of sophistication is kept only if it measurably beats the simpler version it replaces. And the destination isn't a single guess per game — it's <strong style="color:var(--text)">a living platform</strong>: predictions that explain themselves, a win probability that updates possession by possession while the game is on, and season-level forecasts expressed as full probability distributions.</p>
+    </div>
+    <div class="plain-card reveal" style="border-color:rgba(232,163,61,.3)">
+      <div class="pc-label">Why a recruiter should care</div>
+      <p>This project is a working demonstration of how I'd operate on your team: <strong style="color:var(--text)">a documented plan, honest baselines, benchmark-gated complexity, leakage paranoia, and a repository engineered to be maintained.</strong> The roadmap below is long on purpose — I'd rather show you a serious multi-year plan being executed in order than a small finished toy.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= THE SIXTEEN STAGES ================= -->
+<section id="stages" style="padding-top:20px">
+  <div class="wrap">
+    <div class="sec-label reveal">The roadmap</div>
+    <h2 class="reveal">Sixteen stages, <span class="hl">benchmark-gated.</span></h2>
+    <p class="lede reveal">The order is deliberate: dependencies first, highest predictive impact first, and no stage built on an unvalidated foundation. Click any stage to expand it.</p>
+
+    <div class="stage-phase p-done reveal">Shipped — the validated foundation</div>
+
+    <div class="stage reveal">
+      <button class="stage-btn" data-hover aria-expanded="false">
+        <span class="stage-num">01</span><span class="stage-name">Environment &amp; data foundation</span>
+        <span class="stage-status done">SHIPPED</span><span class="stage-arrow">▼</span>
+      </button>
+      <div class="stage-body"><div class="stage-body-in">
+        <p>A Python 3.11 environment with PyTorch and CUDA, configured for GPU training on my own hardware (RTX 5070 Ti, 17GB VRAM). The data pipeline pulls <strong>25 NBA seasons (2000-01 through 2024-25) via the NBA stats API — roughly 68,000 team-game rows across ~34,000 unique games</strong> — then cleans them: win/loss converted to numeric targets, home/away flags computed, dates parsed and sorted chronologically. This dataset is the ground truth everything else stands on.</p>
+      </div></div>
+    </div>
+
+    <div class="stage reveal">
+      <button class="stage-btn" data-hover aria-expanded="false">
+        <span class="stage-num">02</span><span class="stage-name">The team rating engine</span>
+        <span class="stage-status done">SHIPPED</span><span class="stage-arrow">▼</span>
+      </button>
+      <div class="stage-body"><div class="stage-body-in">
+        <p>Win-loss records are a poor predictor, so HoopIQ replaces them with <strong>opponent-adjusted, pace-adjusted net ratings</strong> — points scored minus allowed per 100 possessions — computed over rolling windows (last 3, 5, 10, and 20 games, plus season-to-date). The opponent adjustment matters most: a hot streak built against weak teams gets correctly discounted, and a close loss to a great team isn't punished as if it were a blowout. This single idea carries more predictive weight than anything else in basketball analytics, which is exactly why it was built first.</p>
+      </div></div>
+    </div>
+
+    <div class="stage reveal">
+      <button class="stage-btn" data-hover aria-expanded="false">
+        <span class="stage-num">03</span><span class="stage-name">Feature foundation &amp; leakage protection</span>
+        <span class="stage-status done">SHIPPED</span><span class="stage-arrow">▼</span>
+      </button>
+      <div class="stage-body"><div class="stage-body-in">
+        <p>On top of the ratings: <strong>rest days, back-to-back fatigue flags, win/loss streaks, separated offensive and defensive ratings, and head-to-head matchup context</strong>, merged into one master dataset. Opponent context comes from a <code>GAME_ID</code> self-merge, so each row knows exactly who was on the other side of the ball.</p>
+        <p>The non-negotiable rule: <strong>the model may only see information that existed before tip-off.</strong> Every rolling feature is lagged with strict <code>.shift(1)</code> discipline, so look-ahead bias is structurally impossible rather than merely "checked for." Accidentally peeking at the future is the most common way people fool themselves in sports prediction — the pipeline is designed so it can't happen silently.</p>
+      </div></div>
+    </div>
+
+    <div class="stage reveal">
+      <button class="stage-btn" data-hover aria-expanded="false">
+        <span class="stage-num">04</span><span class="stage-name">Baseline model — and proof it's real</span>
+        <span class="stage-status done">SHIPPED</span><span class="stage-arrow">▼</span>
+      </button>
+      <div class="stage-body"><div class="stage-body-in">
+        <p>A calibrated <strong>XGBoost classifier: 63.9% accuracy, +8.1 percentage points over always picking the home team.</strong> The number matters less than the evidence behind it. Three checks confirm the model learns genuine signal:</p>
+        <p><strong>Shuffle test</strong> — retrain on randomly shuffled labels; accuracy collapses to chance, proving the features aren't leaking the answer. <strong>Baseline comparison</strong> — the model must beat the naive strategy by a real margin, not a rounding error. <strong>Calibration curve</strong> — when the model says 70%, it wins about 70% of the time, so its probabilities mean what they claim.</p>
+        <p>This stage also validated everything before it: if the foundation had a subtle bug, the baseline is where it would have surfaced.</p>
+      </div></div>
+    </div>
+
+    <div class="stage reveal">
+      <button class="stage-btn" data-hover aria-expanded="false">
+        <span class="stage-num">05</span><span class="stage-name">Testing harness &amp; engineering discipline</span>
+        <span class="stage-status done">SHIPPED</span><span class="stage-arrow">▼</span>
+      </button>
+      <div class="stage-body"><div class="stage-body-in">
+        <p>A dynamic model-testing harness where <strong>any new architecture plugs into identical data loading, chronological train/test splits, and evaluation metrics</strong> — so every comparison in this project is apples-to-apples. A shared <code>data_utils</code> module is the single source of truth; a full refactor removed all code duplication across training, testing, and validation scripts.</p>
+        <p>The repository itself is part of the deliverable: modular <code>src/</code> layout, clean commit history with <strong>daily commits</strong>, and a proper <code>.gitignore</code> keeping data and environments out of version control. If someone clones it, it should read like something a team could maintain.</p>
+      </div></div>
+    </div>
+
+    <div class="stage-phase p-now reveal">In progress — right now</div>
+
+    <div class="stage reveal">
+      <button class="stage-btn" data-hover aria-expanded="false">
+        <span class="stage-num">06</span><span class="stage-name">The gradient-boosting bake-off</span>
+        <span class="stage-status now">IN PROGRESS</span><span class="stage-arrow">▼</span>
+      </button>
+      <div class="stage-body"><div class="stage-body-in">
+        <p>Head-to-head benchmarking of <strong>XGBoost vs. LightGBM vs. CatBoost</strong> inside the harness, on identical splits and metrics. My standing rule for the entire project: <strong>no model choice by assertion — every architecture earns its place on a leaderboard or it goes.</strong></p>
+        <p>This stage is also hardening the harness itself. It has already caught real bugs — a silent LightGBM crash and an interface mismatch between the data loader and the model runner — which is precisely the kind of failure a shared testing framework exists to surface.</p>
+      </div></div>
+    </div>
+
+    <div class="stage-phase p-next reveal">Up next — smarter, and always current</div>
+
+    <div class="stage reveal">
+      <button class="stage-btn" data-hover aria-expanded="false">
+        <span class="stage-num">07</span><span class="stage-name">Automated data refresh — the system feeds itself</span>
+        <span class="stage-status next">PLANNED</span><span class="stage-arrow">▼</span>
+      </button>
+      <div class="stage-body"><div class="stage-body-in">
+        <p>Today the dataset updates when I run the collector. This stage makes HoopIQ self-sustaining: a <strong>scheduled pipeline that pulls fresh results every night after games end</strong>, recomputes features, and keeps the model's inputs current without a human in the loop. Unglamorous, and essential — a prediction system that goes stale the moment you stop babysitting it isn't a system. This is also what makes in-season, day-of predictions possible at all.</p>
+      </div></div>
+    </div>
+
+    <div class="stage reveal">
+      <button class="stage-btn" data-hover aria-expanded="false">
+        <span class="stage-num">08</span><span class="stage-name">External signals — injuries &amp; lineup availability</span>
+        <span class="stage-status next">PLANNED</span><span class="stage-arrow">▼</span>
+      </button>
+      <div class="stage-body"><div class="stage-body-in">
+        <p>The current features all come from the game log itself. The next signals come from outside it: <strong>injury reports and lineup availability</strong> — arguably the biggest single piece of information the model can't currently see. A star sitting out moves a game's odds enormously, and no rolling average captures it.</p>
+        <p>Each new source is added as a <strong>measured layer</strong>: integrate it, rerun the full benchmark, and keep it only if it improves on the validated baseline. Features that sound important but don't move the number get documented and cut.</p>
+      </div></div>
+    </div>
+
+    <div class="stage reveal">
+      <button class="stage-btn" data-hover aria-expanded="false">
+        <span class="stage-num">09</span><span class="stage-name">Sequence models — learning momentum directly</span>
+        <span class="stage-status next">PLANNED</span><span class="stage-arrow">▼</span>
+      </button>
+      <div class="stage-body"><div class="stage-body-in">
+        <p>The baseline needs temporal context <em>hand-fed</em> to it through rolling averages. The open question: can a recurrent network (<strong>RNN/GRU</strong>) learn form, momentum, and fatigue <strong>directly from game-by-game sequences</strong> — and beat 63.9%?</p>
+        <p>I'm going in clear-eyed. Well-engineered gradient-boosted trees frequently beat neural networks on tabular sports data, so the sequence model <strong>must outperform the incumbent on the same harness before it replaces anything</strong>. If it loses, that's a finding, not a failure — and it gets written up either way.</p>
+      </div></div>
+    </div>
+
+    <div class="stage reveal">
+      <button class="stage-btn" data-hover aria-expanded="false">
+        <span class="stage-num">10</span><span class="stage-name">Bayesian modeling — owning uncertainty</span>
+        <span class="stage-status next">PLANNED</span><span class="stage-arrow">▼</span>
+      </button>
+      <div class="stage-body"><div class="stage-body-in">
+        <p>A point prediction says "the home team wins." A useful system says "the home team wins <strong>with 61% probability — and here is how confident I am in that 61%</strong>." This stage layers Bayesian methods over the best-performing predictor so the system quantifies its own uncertainty: the difference between a classifier and a forecasting tool you would trust with a real decision. It's also a prerequisite for honest season simulation at the end — uncertainty has to propagate, not disappear.</p>
+      </div></div>
+    </div>
+
+    <div class="stage reveal">
+      <button class="stage-btn" data-hover aria-expanded="false">
+        <span class="stage-num">11</span><span class="stage-name">Explainable predictions — the "why" ships with the number</span>
+        <span class="stage-status next">PLANNED</span><span class="stage-arrow">▼</span>
+      </button>
+      <div class="stage-body"><div class="stage-body-in">
+        <p>A probability alone doesn't earn trust. Every HoopIQ forecast will ship with <strong>factor attribution — a plain-English breakdown of what drove the number</strong>: "OKC 63% — recent defensive rating (+), home court (+), second night of a back-to-back (−), key starter questionable (−)." Under the hood that's feature-attribution analysis over the model; on the surface it's the difference between a black box and a tool an analyst would actually argue with. This is the layer that turns predictions into analysis.</p>
+      </div></div>
+    </div>
+
+    <div class="stage-phase reveal" style="color:var(--ice)">Going live — the dynamic platform</div>
+
+    <div class="stage reveal">
+      <button class="stage-btn" data-hover aria-expanded="false">
+        <span class="stage-num">12</span><span class="stage-name">The live in-game engine — win probability that moves with the game</span>
+        <span class="stage-status next">PLANNED</span><span class="stage-arrow">▼</span>
+      </button>
+      <div class="stage-body"><div class="stage-body-in">
+        <p>This is where HoopIQ stops being a pregame tool and becomes dynamic. The NBA's <strong>live play-by-play feed updates every few seconds during a game</strong> — score, possession, what just happened. HoopIQ will consume that stream and <strong>re-score the win probability after every significant event</strong>: a made three, a foul trouble situation, a star heading to the locker room.</p>
+        <p>Architecturally: live game state flows in, the model re-evaluates, and updates push to the interface in real time. It's the same shape as any live decision system — continuous data in, continuously refreshed probabilities out — which is exactly why I want to build it. Watching your own model's confidence swing possession by possession is also the fastest way to learn where it's naive.</p>
+      </div></div>
+    </div>
+
+    <div class="stage reveal">
+      <button class="stage-btn" data-hover aria-expanded="false">
+        <span class="stage-num">13</span><span class="stage-name">The dashboard &amp; platform — from script to product</span>
+        <span class="stage-status next">PLANNED</span><span class="stage-arrow">▼</span>
+      </button>
+      <div class="stage-body"><div class="stage-body-in">
+        <p>HoopIQ is versioned like a product, not a script — each version independently useful and deployable. The arc: <strong>a web dashboard</strong> showing tonight's slate with probabilities and their explanations → <strong>a public API</strong> so the predictions are programmable → <strong>a pick tracker</strong> that records every forecast the moment it's made, so the model's track record is public and unfudgeable → and eventually user accounts and a mobile experience.</p>
+        <p>The pick tracker is the part I care about most: <strong>a forecasting system that doesn't keep receipts on itself is just opinions with extra steps.</strong></p>
+      </div></div>
+    </div>
+
+    <div class="stage-phase reveal" style="color:var(--muted)">The long game — where it converges</div>
+
+    <div class="stage reveal">
+      <button class="stage-btn" data-hover aria-expanded="false">
+        <span class="stage-num">14</span><span class="stage-name">Player-level modeling</span>
+        <span class="stage-status vision">VISION</span><span class="stage-arrow">▼</span>
+      </button>
+      <div class="stage-body"><div class="stage-body-in">
+        <p>Teams are made of players, and the ceiling of team-level modeling is the point where that abstraction breaks. This stage models <strong>every player individually</strong>: current form, <strong>career trajectories learned by GRUs</strong> over season sequences, <strong>age-performance curves fit with Kolmogorov-Arnold networks</strong> (smooth, interpretable rise-and-decline curves), game-to-game variance, and injury risk. A separate <strong>fine-tuned transformer</strong> reads off-court sentiment signals from text. Each sub-model was chosen for its data's shape — see the architecture table below.</p>
+      </div></div>
+    </div>
+
+    <div class="stage reveal">
+      <button class="stage-btn" data-hover aria-expanded="false">
+        <span class="stage-num">15</span><span class="stage-name">Possession-level simulation</span>
+        <span class="stage-status vision">VISION</span><span class="stage-arrow">▼</span>
+      </button>
+      <div class="stage-body"><div class="stage-body-in">
+        <p>The most granular layer: instead of predicting a game's outcome wholesale, <strong>simulate it possession by possession</strong>, treating each possession as a probabilistic scoring event driven by the players on the floor. The engine is <strong>calibrated logistic regression</strong> — deliberately simple, because it must evaluate millions of possessions fast while keeping probabilities honest. Game outcomes then <em>emerge</em> from the simulation rather than being guessed at the top level — a fundamentally more truthful way to model a sport, and the natural engine behind the live in-game probabilities of stage 12.</p>
+      </div></div>
+    </div>
+
+    <div class="stage reveal">
+      <button class="stage-btn" data-hover aria-expanded="false">
+        <span class="stage-num">16</span><span class="stage-name">The Monte Carlo season engine — the capstone</span>
+        <span class="stage-status vision">FINAL STAGE</span><span class="stage-arrow">▼</span>
+      </button>
+      <div class="stage-body"><div class="stage-body-in">
+        <p>Everything above feeds this. A <strong>GPU-accelerated Monte Carlo simulator</strong> plays out entire NBA seasons thousands of times — every game, every matchup, uncertainty included — producing <strong>win-total distributions, playoff odds, and seed probabilities</strong> instead of single-number guesses. (The widget below is a deliberately tiny preview of the idea.)</p>
+        <p>And it unlocks the two applications this project was pointed at from day one. First, <strong>market comparison</strong>: measuring the model's probabilities against live prediction-market prices to test for systematic mispricings — a genuine quantitative-research exercise in forecast skill. Second, the <strong>research crossover</strong>: roster construction is literally a package query — select a set of players under salary constraints to maximize projected value — so my DREAM Lab optimization work and HoopIQ ultimately converge into one system.</p>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MODEL ASSIGNMENTS ================= -->
+<section style="padding-top:30px">
+  <div class="wrap">
+    <div class="sec-label reveal">Architecture decisions</div>
+    <h2 class="reveal">The right model for <span class="hl">each job.</span></h2>
+    <p class="lede reveal">One model can't do all of this well — the data comes in different shapes. Each component gets the architecture its data actually calls for, and every assignment still has to survive the benchmark before it's final.</p>
+    <div class="table-scroll reveal">
+      <table class="mtable">
+        <thead><tr><th>Component</th><th>Model</th><th>Why this one</th></tr></thead>
+        <tbody>
+          <tr><td>Game prediction (team level)</td><td><code>XGBoost</code> — gradient-boosted trees</td><td>The strongest family on structured, tabular data. Current validated incumbent at 63.9%.</td></tr>
+          <tr><td>Player career trajectories</td><td><code>GRU</code> — recurrent network</td><td>Careers are sequences. A GRU reads season-by-season history and learns rise, peak, and decline directly.</td></tr>
+          <tr><td>Age-performance curves</td><td><code>KAN</code> — Kolmogorov-Arnold network</td><td>Produces smooth, interpretable curves — you can see the shape of aging it learned, not just trust it.</td></tr>
+          <tr><td>Possession outcomes</td><td><code>Calibrated logistic regression</code></td><td>Must score millions of possessions quickly with honest probabilities. Simple on purpose.</td></tr>
+          <tr><td>Off-court sentiment</td><td><code>Fine-tuned transformer</code></td><td>Sentiment lives in text; transformers are the right tool for reading it.</td></tr>
+          <tr><td>Season outcomes</td><td><code>Monte Carlo</code> — GPU-accelerated</td><td>Turns per-game probabilities into full distributions. Uncertainty propagates instead of vanishing.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MONTE CARLO WIDGET ================= -->
+<section style="padding-top:20px">
+  <div class="wrap">
+    <div class="sec-label reveal">Interactive demo</div>
+    <h2 class="reveal">Run a tiny version <span class="hl">right now.</span></h2>
+    <div class="mc reveal">
+      <h3>Monte Carlo season simulation — live in your browser</h3>
+      <p class="mc-sub">A miniature of stage 16. Choose a team's per-game win probability, then simulate 3,000 independent 82-game seasons and watch the win-total distribution take shape. Notice the spread: even a "60% team" has real odds of a disappointing year. That spread is the entire argument for simulating seasons instead of predicting them.</p>
+      <div class="mc-controls">
+        <label for="mcSlider">per-game win probability: <span id="mcProb">0.60</span></label>
+        <input type="range" id="mcSlider" min="30" max="80" value="60" data-hover>
+        <button class="btn solid" id="mcRun" data-hover>Run 3,000 seasons</button>
+      </div>
+      <canvas id="mcCanvas" height="240"></canvas>
+      <div class="mc-read">
+        <span>mean wins <b id="mcMean">—</b></span>
+        <span>10th–90th percentile <b id="mcRange">—</b></span>
+        <span>P(50+ wins) <b id="mcFifty">—</b></span>
+        <span>seasons simulated <b id="mcCount">0</b></span>
+      </div>
+      <p class="mc-note">The real engine replaces this fixed slider with calibrated, per-matchup probabilities — opponent strength, rest, and form vary game to game, and the sampling runs on GPU.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PRINCIPLES ================= -->
+<section style="padding-top:10px">
+  <div class="wrap">
+    <div class="thinking reveal">
+      <h3>The three rules I build by</h3>
+      <p><strong>Complexity has to pay rent.</strong> The tempting move is jumping straight to deep learning. The disciplined move is a validated baseline first — so when a sophisticated model ships, I can prove it earned its place instead of asserting it. Every stage on this page follows that rule.</p>
+      <p><strong>Leakage paranoia is a feature.</strong> Sports data offers endless subtle ways to accidentally see the future. The pipeline makes look-ahead bias structurally impossible, because "we checked for it" is not a guarantee.</p>
+      <p><strong>Built to be used, not listed.</strong> This runs during the actual season — daily commits, a clean public repository, and full refactors over quick patches when the architecture demands it. A project you actually use is a project you can't fake.</p>
+    </div>
+
+    <div class="sub-connect reveal">
+      <div>
+        <h3>Think a stage is ordered wrong?</h3>
+        <p>I genuinely want to hear it. If you've built forecasting systems, worked in sports analytics, or just see a flaw in the plan — challenge it. That kind of input is exactly why this page exists.</p>
+      </div>
+      <div class="sc-btns">
+        <a class="btn solid" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=armaanagarwa@umass.edu&amp;su=Thoughts%20on%20the%20HoopIQ%20roadmap" target="_blank" rel="noopener" data-hover>Challenge the roadmap</a>
+        <a class="btn" href="https://www.linkedin.com/in/armaan-agarwal-781419245/" target="_blank" rel="noopener" data-hover>Connect on LinkedIn</a>
+      </div>
+    </div>
+
+    <div class="next-page reveal">
+      <a href="llm-engine.html" data-hover>← LLM Engine</a>
+      <a href="research.html" data-hover>Next: the research →</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-links">
+    <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=armaanagarwa@umass.edu" target="_blank" rel="noopener" data-hover>email</a>
+    <a href="https://www.linkedin.com/in/armaan-agarwal-781419245/" target="_blank" rel="noopener" data-hover>linkedin</a>
+    <a href="https://github.com/ArmaanAgarwal" target="_blank" rel="noopener" data-hover>github</a>
+    <a href="https://devpost.com/agarwal-armaan27" target="_blank" rel="noopener" data-hover>devpost</a>
+  </div>
+  <div class="foot-fine">© 2026 Armaan Agarwal · designed &amp; built by hand</div>
+</footer>
+
+<script src="assets/app.js"></script>
+</body>
+</html>
